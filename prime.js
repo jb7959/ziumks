@@ -11,12 +11,16 @@ var multer = require('multer'); // v1.0.5
 var upload = multer({ dest: './client/tmp/' }); //임시 디렉토리
 //file 읽기용
 var fs = require('fs');
+//MapReduce 용 패키지 
+var mapReduce = require('mapred')();
 
-//Mapping path of Static file 사용법 : app.use('클라이언트 URI', express.static((__dirname+"실제 서버 경로"));
+
+//Mapping path of Static file. 사용법 : app.use('클라이언트 URI', express.static((__dirname+"실제 서버 경로"));
 app.use('/client', express.static(__dirname+"/client"));
 
-//Template Engine Jade
+//Template Engine Jade 설치 및 views 디렉토리 경로 설정(Views 디렉토리는 추가 생성했음 17.05.25)
 app.set('view engine', 'jade');
+app.set('views', './client/views');
  
 //index 페이지 (1번과제)
 app.get('/', function (req, res) {
@@ -62,32 +66,36 @@ app.get('/2', function (req, res) {
   res.send(output);
 });
 
+//파일 읽고, 처리 
 app.post('/upload',upload.single('upload') ,function (req, res) {
-  //console.log(req.file.path); //파일경로 읽기
-fs.readFile(req.file.path, 'utf8', function(err, data) {console.log("%%%%%%%%#"); //Reading File at ./client/tmp
- var output = `
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="utf-8">
-      <title>텍스트 검색기</title>
-    </head>
-    <body>
-        Hello, 텍스트 구하기
-        <h1>텍스트 검색하기</h1>
-        <ul>
-          ${data}
-        </ul>
-    </body>
-  </html>`;  
-  res.send(output);
-  fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
-  }); 
+ //console.log(req.file.path); //파일경로 읽기
+ var readFile= fs.readFileSync(req.file.path,'utf8'); //Reading File at ./client/tmp 동기방식으로 읽고 buffer로 제공 (옵션으로 두번째 인수로 'utf8' 삽입시 String 반환 )
+ var readFiles = preProcessing(readFile);
+ template(readFiles,res,2); //템플릿엔진을 사용하여 변환
+ fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });
 
 
- 
-//소수값 계산 //to-do 170516 : 1000까지는 무난, 멀티 코어처리 필요 
+//데이터 전처리 함수
+//정규식 참조 https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/%EC%A0%95%EA%B7%9C%EC%8B%9D#special-or
+function preProcessing(data){
+// 공백 삭제 
+ var readFile=data.trim();
+ //정규식으로 문자열 분리/[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 | 't)]/gi;   // 특수문자 제거('t 등 제외)'  예) ^는 시작문자 , |는 OR,  "" 는 모든 특수문자,gi는대/소문자 무시하고 완전 일치, \s 는 모든 공백 
+//var pattern = /[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9) |\w't|\w've|\w'nt|\w's|\w'll|\w're)]/gi; 
+var pattern = /[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9)]/gi;
+ //특수문자 모두 공백으로 변환
+ readFile = readFile.replace(pattern,',');
+ //두개 이상 쉼표는 하나의 쉼표로 변환
+  console.log(readFile);
+ readFile = readFile.replace(/\W{2,}/,'');
+ console.log(readFile);
+ // /\s(?=\w)/는 공백 후 문자가 나오는 곳만 참조
+ var readFiles = readFile.split(',');
+ return readFiles;
+}
+
+//소수값 계산
 function calc(endNum) {
     var resultValue = "2</br>3<br>";
      console.log("******")
@@ -115,29 +123,37 @@ function calc(endNum) {
 }
  
 //html 템플릿 작성 함수
-function template(argument,primeNum) {
-    var output = `
+//index, 1, 2에 따라서 템플릿 리턴 
+function template(argument1,argument2,routeOfURL) {
+    var output = "sorry";
+    //argument1은 범위 끝 숫자, argument2는 범위내 소수값
+  if(routeOfURL==1){output = `
   <!DOCTYPE html>
   <html>
     <head>
       <meta charset="utf-8">
-      <title>${argument}까지의 소수점 구하기</title>
+      <title>${argument1}까지의 소수점 구하기</title>
     </head>
     <body>
         Hello, 소수점 결과!
-        <h1>${argument}까지의 소수점 구하기</h1>
+        <h1>${argument1}까지의 소수점 구하기</h1>
         <ul>
-          ${primeNum}
+          ${argument2}
         </ul>
     </body>
-  </html>`;
+  </html>`;}
+    //argument1은 검색결과,argument2는 Http request
+  if(routeOfURL==2){
+   //Jade로 렌더링 filesWords와 title은 jade에서 사용하는 변수
+   argument2.render('SecondProject', {filesWords:argument1, title:'텍스트 검색기'});
+ }
   return output;
 }
  
 //URI 매핑 및 응답
 app.get('/template', function (req, res) {
   var primeNum = calc(req.param('inputNum'));
-  var output = template(req.param('inputNum'),primeNum);
+  var output = template(req.param('inputNum'),primeNum,1);
   res.send(output);
 });
  
