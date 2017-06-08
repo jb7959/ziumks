@@ -63,11 +63,10 @@ app.get('/2', function (req, res) {
 <div id = resultPage></div>
 <!--AJAX -->
 <script src="./client/js/primes.js"></script>`;
-
   res.send(output);
 });
 
-//파일 읽고, 처리 
+//파일 읽고, 처리 //multer를위한 미들웨어 upload.single('upload')는 뒤의 function(req, res)함수가 실행되기 전에 먼저 실행.매개변수 'upload'는 form을 통해 전송되는 파일의 name속성을 가져야 함.
 app.post('/upload',upload.single('upload') ,function (req, res) {
  //console.log(req.file.path); //파일경로 읽기
  var readFile = fs.readFileSync(req.file.path,'utf8'); //Reading File at ./client/tmp 동기방식으로 읽고 buffer로 제공 (옵션으로 두번째 인수로 'utf8' 삽입시 String 반환 )
@@ -76,6 +75,11 @@ app.post('/upload',upload.single('upload') ,function (req, res) {
  fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });
 
+app.get('/upload/download',function (req, res) {
+ 
+ res.download('./client/tmp/1496378302169_was.txt');
+ //fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
+});
 
 function doFinder(file,serchingText,preProcessingFunc,serchingFunc) {
    var readFiles = preProcessingFunc(file);
@@ -98,18 +102,25 @@ var pattern = /[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9)]/gi;
  readFile = readFile.replace(/\,{2,10}/,'');
  // /\s(?=\w)/는 공백 후 문자가 나오는 곳만 참조
  var readFiles = readFile.split(',');
- serchingText(readFiles);
  return readFiles;
 }
 
 function serchingText(data,findText){
     var textC = 0;
     var textInclude = "N";
+    var date = new Date();
     for(var arrayNum in data){
         if(data[arrayNum] == "was"){textC++;}
     }
     if(textC>0){textInclude ="Y";}
-    var out = ["findText : " + findText,"textInclude : " + textInclude,"textCount : " + textC] ;
+    
+    var outForSaving = "findText : " + findText+"\n"+"textInclude : " + textInclude+"\n"+"textCount : "+textC+"\n"+"Time : " + date.toDateString();
+    console.log(date.toDateString());
+    //파일명: 날짜_검색문자
+    var extractedFileName = Date.now()+"_"+findText
+    fs.writeFileSync(("./client/tmp/"+extractedFileName+".txt"), outForSaving, 'utf8');
+    console.log('동기적 파일 쓰기 완료');
+    var out = ["findText : " + findText,"textInclude : " + textInclude,"textCount : " + textC,"Time : " + date.toDateString()] ;
     return out;
 }
 
@@ -176,6 +187,6 @@ app.get('/template', function (req, res) {
 });
  
 //서버 실행 
-app.listen(8080, function () {
+app.listen(9002, function () {
   console.log('Example app listening on port 8080!');
 });
