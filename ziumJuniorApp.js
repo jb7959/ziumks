@@ -54,11 +54,17 @@ app.get('/2', function (req, res) {
   - 서버에서 또는 서버연동 화면으로 실행 (언어무관)
 
 </h3>
+<table>
 <form action="./upload" method="post" enctype="multipart/form-data">
-<input type="file" name="upload" id="uploadfile" />
-<input type="text" size="7" id="serchingText" />
-<input type="submit" name="upload" id="upload"/>
-</form>
+<tr>
+ <th><p>업로드 파일 :</p></th> 
+ <td><input type="file" name="upload" id="uploadfile" /></tr></td>
+<tr>
+ <th><p>검색어 :</p></th>
+<td><input type="text" size="7" id="word" name="word" /></tr></td>
+<th><p>     </p></th>
+<tr><td><input type="submit" name="upload" id="upload"/></tr></td>
+</form></table>
 </div>
 <div id = resultPage></div>`;
   res.send(output);
@@ -67,10 +73,11 @@ app.get('/2', function (req, res) {
 //파일 읽고, 처리 //multer를위한 미들웨어 upload.single('upload')는 뒤의 function(req, res)함수가 실행되기 전에 먼저 실행.매개변수 'upload'는 form을 통해 전송되는 파일의 name속성을 가져야 함.
 app.post('/upload',upload.single('upload') ,function (req, res) {
  //console.log(req.file.path); //파일경로 읽기
- var readFile = fs.readFileSync(req.file.path,'utf8'); //Reading File at ./client/tmp 동기방식으로 읽고 buffer로 제공 (옵션으로 두번째 인수로 'utf8' 삽입시 String 반환 )
+ var readFile = fs.readFileSync(req.file.path,'utf8'); //Reading File at ./client/tmp 동기방식으로 읽고 buffer로 제공 (옵션으로 두번째 인수로 'utf8' 삽입시 String 반환)
+ var word = req.body.word;
  var serchingTextFunc = textFinder.serchingText;
  var preProcessingFunc = textFinder.preProcessing;
- var readFiles = textFinder.doFinder(readFile,"was",preProcessingFunc,serchingTextFunc);
+ var readFiles = textFinder.doFinder(readFile,word,preProcessingFunc,serchingTextFunc);
  template(readFiles,res,2); //템플릿엔진을 사용하여 변환
  fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });

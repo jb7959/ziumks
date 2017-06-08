@@ -12,7 +12,7 @@ var serchingText = function(data,word){
     var textInclude = "N";
     var date = new Date();
     for(var arrayNum in data){
-        if(!data[arrayNum].localeCompare("was")){cnt++;} //최종민 전임 참조 17.06.08
+        if(!data[arrayNum].localeCompare(word)){cnt++;} //최종민 전임 참조 17.06.08
     }
     if(cnt>0){textInclude ="Y";}
     

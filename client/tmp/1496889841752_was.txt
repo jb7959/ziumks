@@ -1,4 +1,0 @@
-findText : was
-textInclude : Y
-textCount : 199
-Time : Thu Jun 08 2017
