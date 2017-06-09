@@ -53,8 +53,7 @@ app.post('/upload', upload.single('upload'), function (req, res) {
     var data = textFinder.doFinder(readFile, word, preProcessingFunc, serchingTextFunc);
     var extractedFileName = data[4];
     data.pop(); //데이터 맨뒤 extractedFileName 제거
-    template(res, 2, [data, extractedFileName]);
-    ; //템플릿엔진을 사용하여 변환
+    template(res, 2, [data, extractedFileName]);//템플릿엔진을 사용하여 변환
     fs.unlink(req.file.path, function (err) {
         if (err) throw err;
         console.log('successfully deleted' + req.file.path);

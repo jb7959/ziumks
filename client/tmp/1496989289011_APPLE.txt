@@ -1,0 +1,4 @@
+findText : APPLE
+textInclude : Y
+textCount : 7
+Time : Fri Jun 09 2017
