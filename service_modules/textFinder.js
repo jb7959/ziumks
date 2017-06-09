@@ -16,13 +16,13 @@ var serchingText = function(data,word){
     }
     if(cnt>0){textInclude ="Y";}
     
-    var outForSaving = "findText : " + word+"\n"+"textInclude : " + textInclude+"\n"+"textCount : "+cnt+"\n"+"Time : " + date.toDateString();
+    var outForSaving = "findText : " + word+"\r\n"+"textInclude : " + textInclude+"\r\n"+"textCount : "+cnt+"\r\n"+"Time : " + date.toDateString();
     console.log(date.toDateString());
     //파일명: 날짜_검색문자
     var extractedFileName = Date.now()+"_"+word
     fs.writeFileSync(("./client/tmp/"+extractedFileName+".txt"), outForSaving, 'utf8');
     console.log('동기적 파일 쓰기 완료');
-    var out = ["findText : " + word,"textInclude : " + textInclude,"textCount : " + cnt,"Time : " + date.toDateString()] ;
+    var out = ["findText : " + word,"textInclude : " + textInclude,"textCount : " + cnt,"Time : " + date.toDateString(),extractedFileName] ; //검색어, 존재유무, 숫자, 시간, 저장파일명
     return out;
 }
 

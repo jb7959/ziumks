@@ -77,20 +77,23 @@ app.post('/upload',upload.single('upload') ,function (req, res) {
  var word = req.body.word;
  var serchingTextFunc = textFinder.serchingText;
  var preProcessingFunc = textFinder.preProcessing;
- var readFiles = textFinder.doFinder(readFile,word,preProcessingFunc,serchingTextFunc);
- template(readFiles,res,2); //템플릿엔진을 사용하여 변환
+ var data = textFinder.doFinder(readFile,word,preProcessingFunc,serchingTextFunc);
+ var extractedFileName = data[4];
+ data.pop(); //데이터 맨뒤 extractedFileName 제거
+ template(data,res,2,extractedFileName); //템플릿엔진을 사용하여 변환
  fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });
 
-app.get('/upload/download',function (req, res) {
- res.download('./client/tmp/1496378302169_was.txt');
+app.get('/download/:id',function (req, res) {
+    var downloadLocation = './client/tmp/'+req.params.id+'.txt';
+ res.download(downloadLocation);
  //fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });
 
 
 //html 템플릿 작성 함수
 //index, 1, 2에 따라서 템플릿 리턴 
-function template(argument1,argument2,routeOfURL) {
+function template(argument1,argument2,routeOfURL,etc) {
     var output = "sorry";
     //argument1은 범위 끝 숫자, argument2는 범위내 소수값
   if(routeOfURL==1){output = `
@@ -108,10 +111,11 @@ function template(argument1,argument2,routeOfURL) {
         </ul>
     </body>
   </html>`;}
+
     //argument1은 검색결과,argument2는 Http request
   if(routeOfURL==2){
    //Jade로 렌더링 filesWords와 title은 jade에서 사용하는 변수
-   argument2.render('SecondProject', {filesWords:argument1, title:'텍스트 검색기'});
+   argument2.render('SecondProject', {filesWords:argument1, title:'텍스트 검색기', fileName:etc});
  }
   return output;
 }
