@@ -1,8 +1,8 @@
 /****
-    Writer : Jae Yeoul Ahn
-    Propose : This code is for private task by ZiumKS to be good Junior consuktant. 소수점 구하기 문제
-    Date : 2017.05.16
-****/
+ Writer : Jae Yeoul Ahn
+ Propose : This code is for private task by ZiumKS to be good Junior consuktant. 소수점 구하기 문제
+ Date : 2017.05.16
+ ****/
 
 //import servicemodules for server.js
 const textFinder = require('./service_modules/textFinder.js');
@@ -22,10 +22,10 @@ app.use('/client', express.static(__dirname+"/client"));
 //Template Engine Jade 설치 및 views 디렉토리 경로 설정(Views 디렉토리는 추가 생성했음 17.05.25)
 app.set('view engine', 'jade');
 app.set('views', './client/views');
- 
+
 //index 페이지 (1번과제)
 app.get('/', function (req, res) {
-  var output = `
+    var output = `
 <div id="index">
 <h1>개별과제 1 소수구하기</h1>
 <h3>A) 1부터 10000까지 숫자 중 소수 (1과 자기 자신으로만 나눌 수 있는 정수)를 구하는 
@@ -39,13 +39,20 @@ app.get('/', function (req, res) {
 </div>
 <div id = resultPage></div>
 <!--AJAX -->
-<script src="./client/js/primes.js"></script>`;  
-  res.send(output);
+<script src="./client/js/primes.js"></script>`;
+    res.send(output);
+});
+
+//prime 계산을 위한 AJAX 호출 URI 매핑 및 응답
+app.get('/template', function (req, res) {
+    var primeNum = calcPrime.calc(req.param('inputNum'));
+    var endNum = req.param('inputNum');
+    template(res,1,[endNum,primeNum]); //템플릿엔진을 사용하여 변환
 });
 
 //2번과제
 app.get('/finder', function (req, res) {
-  var output = `
+    var output = `
 <div id="index">
 <h1>개별과제 2 파일내 텍스트 확인기</h1>
 <h3> B) 텍스트 형태의 파일에서 특정 문자열을 찾아 검출여부, 검출횟수를 파일로 기록하는
@@ -67,67 +74,46 @@ app.get('/finder', function (req, res) {
 </form></table>
 </div>
 <div id = resultPage></div>`;
-  res.send(output);
+    res.send(output);
 });
 
 //파일 읽고, 처리 //multer를위한 미들웨어 upload.single('upload')는 뒤의 function(req, res)함수가 실행되기 전에 먼저 실행.매개변수 'upload'는 form을 통해 전송되는 파일의 name속성을 가져야 함.
 app.post('/upload',upload.single('upload') ,function (req, res) {
- //console.log(req.file.path); //파일경로 읽기
- var readFile = fs.readFileSync(req.file.path,'utf8'); //Reading File at ./client/tmp 동기방식으로 읽고 buffer로 제공 (옵션으로 두번째 인수로 'utf8' 삽입시 String 반환)
- var word = req.body.word;
- var serchingTextFunc = textFinder.serchingText;
- var preProcessingFunc = textFinder.preProcessing;
- var data = textFinder.doFinder(readFile,word,preProcessingFunc,serchingTextFunc);
- var extractedFileName = data[4];
- data.pop(); //데이터 맨뒤 extractedFileName 제거
- template(data,res,2,extractedFileName); //템플릿엔진을 사용하여 변환
- fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
+    //console.log(req.file.path); //파일경로 읽기
+    var readFile = fs.readFileSync(req.file.path,'utf8'); //Reading File at ./client/tmp 동기방식으로 읽고 buffer로 제공 (옵션으로 두번째 인수로 'utf8' 삽입시 String 반환)
+    var word = req.body.word;
+    var serchingTextFunc = textFinder.serchingText;
+    var preProcessingFunc = textFinder.preProcessing;
+    var data = textFinder.doFinder(readFile,word,preProcessingFunc,serchingTextFunc);
+    var extractedFileName = data[4];
+    data.pop(); //데이터 맨뒤 extractedFileName 제거
+    template(res,2,[data,extractedFileName]);; //템플릿엔진을 사용하여 변환
+    fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });
 
 app.get('/download/:id',function (req, res) {
     var downloadLocation = './client/tmp/'+req.params.id+'.txt';
- res.download(downloadLocation);
- //fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
+    res.download(downloadLocation);
+    //fs.unlink(req.file.path, function (err) { if (err) throw err; console.log('successfully deleted'+req.file.path); }); //Removing File at ./client/tmp
 });
 
 
 //html 템플릿 작성 함수
-//index, 1, 2에 따라서 템플릿 리턴 
-function template(argument1,argument2,routeOfURL,etc) {
+//index, 1, 2에 따라서 템플릿 리턴
+function template(HTTPResponse,routeOfURL,data) {
     var output = "sorry";
-    //argument1은 범위 끝 숫자, argument2는 범위내 소수값
-  if(routeOfURL==1){output = `
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <meta charset="utf-8">
-      <title>${argument1}까지의 소수점 구하기</title>
-    </head>
-    <body>
-        Hello, 소수점 결과!
-        <h1>${argument1}까지의 소수점 구하기</h1>
-        <ul>
-          ${argument2}
-        </ul>
-    </body>
-  </html>`;}
+    //data[0]은 범위 끝 숫자, data[1] 범위내 소수값
+    if(routeOfURL==1){HTTPresponse.render('primeProject', {endNumber:data[0], primeNumbers:data[1]});}
 
-    //argument1은 검색결과,argument2는 Http request
-  if(routeOfURL==2){
-   //Jade로 렌더링 filesWords와 title은 jade에서 사용하는 변수
-   argument2.render('SecondProject', {filesWords:argument1, title:'텍스트 검색기', fileName:etc});
- }
-  return output;
+    //data[0]은 검색어, data[1]은 파일명
+    if(routeOfURL==2){
+        //Jade로 렌더링 filesWords와 title은 jade에서 사용하는 변수
+        HTTPResponse.render('SecondProject', {filesWords:data[0], title:'텍스트 검색기', fileName:data[1]});
+    }
+    return output;
 }
- 
-//URI 매핑 및 응답
-app.get('/template', function (req, res) {
-  var primeNum = calcPrime.calc(req.param('inputNum'));
-  var output = template(req.param('inputNum'),primeNum,1);
-  res.send(output);
-});
- 
+
 //서버 실행 
 app.listen(9002, function () {
-  console.log('Example app listening on port 9002!');
+    console.log('Example app listening on port 9002!');
 });

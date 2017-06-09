@@ -1,6 +1,6 @@
 //소수값 계산
 var calc = function(endNum) {
-    var resultValue = "2</br>3<br>";
+    var resultValue = [2,3];
      console.log("******")
     for(var i=4;(i<=endNum);i++){
         var checkP = 0;//나눠지는 숫자개수
@@ -17,11 +17,11 @@ var calc = function(endNum) {
             if(checkP>2){break;}
         }
         //console.log("i가 "+i+"일떄"+"checkP 는 "+ checkP);
-        if(checkP==2){resultValue+=(i.toString()+"</br>");}
+        if(checkP==2){resultValue.push(i)}
         checkP = 0;
     }
     console.log("******")
-    return resultValue;
+return resultValue;
 }
 
 module.exports.calc = calc;
