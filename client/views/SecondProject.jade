@@ -1,6 +1,8 @@
 html
   head
     title= title
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css", rel="stylesheet")
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css", rel="stylesheet")
   body
     h1 텍스트 검색결과
     // p #{filesWords}
@@ -9,3 +11,5 @@ html
        li= word
   button(onclick="location.href='./finder'") 다시찾기
   button(onclick="location.href='./download/#{fileName}'") 파일로 저장
+
+  script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")

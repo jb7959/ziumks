@@ -1,5 +1,5 @@
 //소수값 계산
-var calc = function(endNum) {
+var calc = function (endNum) {
     var resultValue = [2,3];
      console.log("******")
     for(var i=4;(i<=endNum);i++){

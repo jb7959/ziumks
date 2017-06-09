@@ -1,8 +1,16 @@
 html
   head
+   meta( charset='utf-8' )
+   meta( name='viewport', content='width=device-width, initial-scale=1.0' )
+   meta( name='description', content='Baking Bootstrap Snippets with Jade' )
+   //- Bootswatch Theme
     title #{endNumber}까지의 소수점 구하기
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css", rel="stylesheet")
+    link(href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css", rel="stylesheet")
   body
     h1 Hello, #{endNumber}까지 소수점 결과!
     ul
       each num in primeNumbers
        li= num
+
+   script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")
