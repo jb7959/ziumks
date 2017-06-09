@@ -74,7 +74,7 @@ function template(HTTPResponse, routeOfURL, data) {
     var output = "sorry";
     //data[0]은 범위 끝 숫자, data[1] 범위내 소수값
     if (routeOfURL == 1) {
-        HTTPresponse.render('primeProject', {endNumber: data[0], primeNumbers: data[1]});
+        HTTPResponse.render('primeProject', {endNumber: data[0], primeNumbers: data[1]});
     }
 
     //data[0]은 검색어, data[1]은 파일명
