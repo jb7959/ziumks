@@ -44,7 +44,7 @@ app.get('/', function (req, res) {
 });
 
 //2번과제
-app.get('/2', function (req, res) {
+app.get('/finder', function (req, res) {
   var output = `
 <div id="index">
 <h1>개별과제 2 파일내 텍스트 확인기</h1>
@@ -128,6 +128,6 @@ app.get('/template', function (req, res) {
 });
  
 //서버 실행 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!');
+app.listen(9002, function () {
+  console.log('Example app listening on port 9002!');
 });
