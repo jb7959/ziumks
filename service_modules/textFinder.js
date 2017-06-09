@@ -31,7 +31,7 @@ var serchingText = function(data,word){
 //정규식 참조 https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/%EC%A0%95%EA%B7%9C%EC%8B%9D#special-or
 var preProcessing = function(data){
 // 맨앞뒤 공백 삭제 및 소문자
- var readFile=data.trim().toLowerCase();
+ var readFile=data.trim().toLowerCase(); //장소진 전임 참조 17.06.08
  //정규식으로 문자열 분리/[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9 | 't)]/gi;   // 특수문자 제거('t 등 제외)'  예) ^는 시작문자 , |는 OR,  "" 는 모든 특수문자,gi는대/소문자 무시하고 완전 일치, \s 는 모든 공백 
 //var pattern = /[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9) |\w't|\w've|\w'nt|\w's|\w'll|\w're)]/gi; 
 var pattern = /[^(가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9)]/gi;
